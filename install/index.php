@@ -11,6 +11,13 @@
 
 session_start();
 
+// Debug-Modus aktivieren (kann später entfernt werden)
+$debug = isset($_GET['debug']) || isset($_POST['debug']);
+if ($debug) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+}
+
 // Basis-Pfade
 define('ROOT_PATH', dirname(__DIR__));
 define('CONFIG_PATH', ROOT_PATH . '/config');
@@ -26,6 +33,18 @@ if ($step !== 'complete' && file_exists(CONFIG_PATH . '/app.php')) {
         header('Location: /');
         exit;
     }
+}
+
+// Session-Debug-Info
+if ($debug) {
+    echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;">';
+    echo '<strong>Debug Info:</strong><br>';
+    echo 'Current Step: ' . htmlspecialchars($step) . '<br>';
+    echo 'Session ID: ' . session_id() . '<br>';
+    echo 'Session Data: <pre>' . htmlspecialchars(print_r($_SESSION, true)) . '</pre>';
+    echo 'POST Data: <pre>' . htmlspecialchars(print_r($_POST, true)) . '</pre>';
+    echo 'GET Data: <pre>' . htmlspecialchars(print_r($_GET, true)) . '</pre>';
+    echo '</div>';
 }
 
 // Fehler-Array
@@ -256,6 +275,12 @@ $success = [];
             </div>
             
             <?php
+            // Schritt-Validierung
+            $validSteps = ['welcome', 'requirements', 'database', 'admin', 'settings', 'complete'];
+            if (!in_array($step, $validSteps)) {
+                $step = 'welcome';
+            }
+            
             // Schritt-spezifischer Content
             switch ($step) {
                 case 'welcome':

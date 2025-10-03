@@ -3,6 +3,28 @@
  * Installation Step 2: System Requirements Check
  */
 
+$errors = [];
+$success = [];
+
+// Weiter zum nächsten Schritt
+if ($_POST && isset($_POST['continue'])) {
+    // Alle erforderlichen Checks nochmals durchführen
+    $allPassed = true;
+    
+    // Kurzer Re-Check der wichtigsten Anforderungen
+    if (version_compare(PHP_VERSION, '8.1.0', '<')) $allPassed = false;
+    if (!extension_loaded('pdo_mysql')) $allPassed = false;
+    if (!is_writable(ROOT_PATH)) $allPassed = false;
+    
+    if ($allPassed) {
+        $_SESSION['requirements_passed'] = true;
+        header('Location: ?step=database');
+        exit;
+    } else {
+        $errors[] = 'Nicht alle Systemanforderungen sind erfüllt.';
+    }
+}
+
 // System-Checks durchführen
 $checks = [
     'PHP Version (≥ 8.1)' => [
@@ -77,12 +99,12 @@ $phpSettings = [
     'Upload Max Filesize' => [
         'current' => ini_get('upload_max_filesize'),
         'recommended' => '≥ 32M',
-        'status' => $this->parseSize(ini_get('upload_max_filesize')) >= $this->parseSize('32M')
+        'status' => parseSize(ini_get('upload_max_filesize')) >= parseSize('32M')
     ],
     'Post Max Size' => [
         'current' => ini_get('post_max_size'),
         'recommended' => '≥ 32M',
-        'status' => $this->parseSize(ini_get('post_max_size')) >= $this->parseSize('32M')
+        'status' => parseSize(ini_get('post_max_size')) >= parseSize('32M')
     ]
 ];
 
@@ -166,9 +188,22 @@ foreach ($checks as $check) {
     </div>
 <?php endif; ?>
 
-<div class="navigation">
-    <a href="?step=welcome" class="btn btn-secondary">← Zurück</a>
-    <?php if ($allRequired): ?>
-        <a href="?step=database" class="btn">Weiter →</a>
-    <?php endif; ?>
-</div>
+<?php if (!empty($errors)): ?>
+    <div class="alert alert-error">
+        <strong>Fehler:</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+            <?php foreach ($errors as $error): ?>
+                <li><?= htmlspecialchars($error) ?></li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php endif; ?>
+
+<form method="post" style="margin-top: 20px;">
+    <div class="navigation">
+        <a href="?step=welcome" class="btn btn-secondary">← Zurück</a>
+        <?php if ($allRequired): ?>
+            <button type="submit" name="continue" class="btn">Weiter →</button>
+        <?php endif; ?>
+    </div>
+</form>
