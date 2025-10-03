@@ -1,0 +1,68 @@
+# Dependencies
+/vendor/
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+
+# Build artifacts
+/build/.cache
+/build/dist
+/public/assets/*.css
+/public/assets/*.js
+/public/assets/*.map
+
+# Uploads and generated files
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# IDE and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test coverage
+coverage/
+.nyc_output/
+.phpunit.result.cache
+/tests/.phpunit.result.cache
+
+# Temporary files
+tmp/
+temp/
+.tmp
+.temp
+
+# Cache
+.cache/
+*.cache
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Composer
+composer.phar
+composer.lock
+
+# Package managers
+package-lock.json
+yarn.lock

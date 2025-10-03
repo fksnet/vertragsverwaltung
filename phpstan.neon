@@ -1,0 +1,16 @@
+parameters:
+    level: max
+    paths:
+        - app
+        - tests
+    excludePaths:
+        - app/Views
+        - tests/bootstrap.php
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    ignoreErrors:
+        # Ignore specific errors that are false positives
+        - '#Function [a-zA-Z_]+\(\) should return .+ but return statement is missing#'
+        - '#Parameter .+ of method .+ is never read, only written#'
+    bootstrapFiles:
+        - vendor/autoload.php

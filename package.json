@@ -1,0 +1,39 @@
+{
+  "name": "vertragsverwaltung",
+  "version": "1.0.0",
+  "description": "Moderne Familien-Vertragsverwaltung Frontend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "build": "npm run build:css",
+    "build:css": "tailwindcss -i ./build/input.css -o ./public/assets/app.css --postcss",
+    "build:prod": "npm run build:css -- --minify",
+    "watch": "npm run build:css -- --watch",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "php",
+    "tailwindcss",
+    "htmx",
+    "alpine",
+    "daisyui",
+    "contract-management"
+  ],
+  "author": "GenSpark AI Developer",
+  "license": "MIT",
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "daisyui": "^3.9.4",
+    "postcss": "^8.4.31",
+    "postcss-cli": "^10.1.0",
+    "tailwindcss": "^3.3.5"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}
