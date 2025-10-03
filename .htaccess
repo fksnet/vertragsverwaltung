@@ -1,0 +1,148 @@
+# Vertragsverwaltung .htaccess
+# Kompatibel mit den meisten Apache-Webhosting-Umgebungen
+
+# PHP-Version und Sicherheitseinstellungen (falls vom Hoster unterstützt)
+<IfModule mod_php.c>
+    # Empfohlene PHP-Version
+    php_value auto_prepend_file ""
+    php_value auto_append_file ""
+    
+    # Sicherheitseinstellungen
+    php_flag register_globals off
+    php_flag magic_quotes_gpc off
+    php_flag allow_url_fopen off
+    php_flag allow_url_include off
+    php_value max_execution_time 120
+    php_value max_input_time 120
+    php_value memory_limit "256M"
+    php_value post_max_size "32M"
+    php_value upload_max_filesize "32M"
+    php_value max_file_uploads 20
+    
+    # Session-Sicherheit
+    php_flag session.cookie_httponly on
+    php_flag session.use_strict_mode on
+    php_value session.gc_maxlifetime 7200
+</IfModule>
+
+# Sicherheit: Sensible Dateien schützen
+<FilesMatch "\.(env|log|sql|md|json|lock|yml|yaml)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Konfigurationsdateien schützen
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Verzeichnisse schützen
+<DirectoryMatch "^(config|database|storage|tests|scripts|app)/">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# Composer-Dateien schützen
+<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Git-Verzeichnis schützen
+<DirectoryMatch "\.git">
+    Order allow,deny
+    Deny from all
+</DirectoryMatch>
+
+# URL-Rewriting aktivieren
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Installation Wizard
+    RewriteRule ^install/?$ install/index.php [L]
+    RewriteRule ^install/(.+)$ install/index.php?step=$1 [L,QSA]
+    
+    # API-Routen
+    RewriteRule ^api/(.*)$ index.php?route=api/$1 [L,QSA]
+    
+    # Admin-Routen
+    RewriteRule ^admin/?$ index.php?route=admin [L,QSA]
+    RewriteRule ^admin/(.*)$ index.php?route=admin/$1 [L,QSA]
+    
+    # Haupt-Anwendungsrouten
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
+</IfModule>
+
+# MIME-Typen für Assets
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType image/svg+xml .svg
+    AddType application/json .json
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType font/ttf .ttf
+    AddType font/eot .eot
+</IfModule>
+
+# Kompression (falls verfügbar)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# Caching für statische Dateien
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType font/woff "access plus 1 month"
+    ExpiresByType font/woff2 "access plus 1 month"
+</IfModule>
+
+# Cache-Control Headers
+<IfModule mod_headers.c>
+    # CSS und JS
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    
+    # Bilder
+    <FilesMatch "\.(png|jpg|jpeg|gif|svg|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+    
+    # Fonts
+    <FilesMatch "\.(woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=2592000"
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+    
+    # HTML-Dateien nicht cachen
+    <FilesMatch "\.(html|htm|php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires 0
+    </FilesMatch>
+</IfModule>
+
+# Standardfehlerseiten
+ErrorDocument 404 /index.php?route=error/404
+ErrorDocument 403 /index.php?route=error/403
+ErrorDocument 500 /index.php?route=error/500
