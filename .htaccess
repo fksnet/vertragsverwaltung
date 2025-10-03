@@ -1,76 +1,54 @@
-# Vertragsverwaltung .htaccess
-# Kompatibel mit den meisten Apache-Webhosting-Umgebungen
+# Vertragsverwaltung .htaccess (Apache 2.4+)
 
-# PHP-Version und Sicherheitseinstellungen (falls vom Hoster unterstützt)
+# PHP-Einstellungen nur falls mod_php aktiv ist
 <IfModule mod_php.c>
-    # Empfohlene PHP-Version
     php_value auto_prepend_file ""
     php_value auto_append_file ""
-    
-    # Sicherheitseinstellungen
-    php_flag register_globals off
-    php_flag magic_quotes_gpc off
     php_flag allow_url_fopen off
     php_flag allow_url_include off
     php_value max_execution_time 120
     php_value max_input_time 120
-    php_value memory_limit "256M"
-    php_value post_max_size "32M"
-    php_value upload_max_filesize "32M"
+    php_value memory_limit 256M
+    php_value post_max_size 32M
+    php_value upload_max_filesize 32M
     php_value max_file_uploads 20
-    
-    # Session-Sicherheit
     php_flag session.cookie_httponly on
     php_flag session.use_strict_mode on
     php_value session.gc_maxlifetime 7200
 </IfModule>
 
-# Sicherheit: Sensible Dateien schützen
-<FilesMatch "\.(env|log|sql|md|json|lock|yml|yaml)$">
-    Order allow,deny
-    Deny from all
+# sensible Dateien sperren
+<FilesMatch "\.(env|log|sql|md|json|lock|ya?ml)$">
+    Require all denied
 </FilesMatch>
 
-# Konfigurationsdateien schützen
+# Konfigurationsdateien sperren
 <Files "config.php">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </Files>
 
-# Verzeichnisse schützen
-<DirectoryMatch "^(config|database|storage|tests|scripts|app)/">
-    Order allow,deny
-    Deny from all
-</DirectoryMatch>
-
-# Composer-Dateien schützen
-<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|phpstan\.neon)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-
-# Git-Verzeichnis schützen
-<DirectoryMatch "\.git">
-    Order allow,deny
-    Deny from all
-</DirectoryMatch>
-
-# URL-Rewriting aktivieren
+# --- statt <DirectoryMatch>: per Rewrite auf 403 setzen ---
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
+    # Interne Verzeichnisse sperren
+    RewriteRule ^(?:config|database|storage|tests|scripts|app)/ - [F]
+
+    # Git-Verzeichnis sperren
+    RewriteRule (^|/)\.git/ - [F]
+
     # Installation Wizard
     RewriteRule ^install/?$ install/index.php [L]
     RewriteRule ^install/(.+)$ install/index.php?step=$1 [L,QSA]
-    
-    # API-Routen
+
+    # API
     RewriteRule ^api/(.*)$ index.php?route=api/$1 [L,QSA]
-    
-    # Admin-Routen
+
+    # Admin
     RewriteRule ^admin/?$ index.php?route=admin [L,QSA]
     RewriteRule ^admin/(.*)$ index.php?route=admin/$1 [L,QSA]
-    
-    # Haupt-Anwendungsrouten
+
+    # Front-Controller
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
