@@ -1,4 +1,4 @@
--- Vertragsverwaltung Database Schema
+-- Vertragsverwaltung Database Schema (Safe for repeated installation)
 -- Version 1.0.0
 -- Compatible with MySQL 8.0+ and MariaDB 10.5+
 
@@ -240,75 +240,6 @@ CREATE TABLE IF NOT EXISTS `freigaben` (
   KEY `freigaben_expires_at_index` (`expires_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Notfallkontakte-Tabelle
-CREATE TABLE IF NOT EXISTS `notfall_kontakte` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `phone` varchar(20) DEFAULT NULL,
-  `relationship` varchar(100) NOT NULL,
-  `priority` tinyint(4) NOT NULL,
-  `can_access_contracts` tinyint(1) NOT NULL DEFAULT 0,
-  `can_access_credentials` tinyint(1) NOT NULL DEFAULT 0,
-  `can_access_documents` tinyint(1) NOT NULL DEFAULT 0,
-  `notification_preference` enum('email','phone','both') NOT NULL DEFAULT 'email',
-  `is_verified` tinyint(1) NOT NULL DEFAULT 0,
-  `verification_token` varchar(64) DEFAULT NULL,
-  `verified_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `notfall_kontakte_user_id_priority_unique` (`user_id`,`priority`),
-  KEY `notfall_kontakte_user_id_foreign` (`user_id`),
-  KEY `notfall_kontakte_is_verified_index` (`is_verified`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Notfallzugriffe-Tabelle
-CREATE TABLE IF NOT EXISTS `notfall_zugriffe` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `kontakt_id` bigint(20) UNSIGNED NOT NULL,
-  `reason` text NOT NULL,
-  `urgency` enum('low','medium','high','critical') NOT NULL DEFAULT 'medium',
-  `status` enum('pending','verification_sent','active','denied','expired','deactivated') NOT NULL DEFAULT 'pending',
-  `verification_code` varchar(6) NOT NULL,
-  `access_token` varchar(64) NOT NULL,
-  `request_ip` varchar(45) DEFAULT NULL,
-  `request_user_agent` text DEFAULT NULL,
-  `approved_at` timestamp NULL DEFAULT NULL,
-  `approved_by` bigint(20) UNSIGNED DEFAULT NULL,
-  `denied_at` timestamp NULL DEFAULT NULL,
-  `denied_by` bigint(20) UNSIGNED DEFAULT NULL,
-  `denial_reason` text DEFAULT NULL,
-  `deactivated_at` timestamp NULL DEFAULT NULL,
-  `expires_at` timestamp NOT NULL,
-  `access_count` int(11) NOT NULL DEFAULT 0,
-  `last_accessed_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `notfall_zugriffe_access_token_unique` (`access_token`),
-  KEY `notfall_zugriffe_user_id_foreign` (`user_id`),
-  KEY `notfall_zugriffe_kontakt_id_foreign` (`kontakt_id`),
-  KEY `notfall_zugriffe_status_index` (`status`),
-  KEY `notfall_zugriffe_urgency_index` (`urgency`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Zwei-Faktor Backup-Codes
-CREATE TABLE IF NOT EXISTS `two_factor_backup_codes` (
-  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) UNSIGNED NOT NULL,
-  `code_hash` varchar(255) NOT NULL,
-  `encrypted_code` text NOT NULL,
-  `used_at` timestamp NULL DEFAULT NULL,
-  `used_ip` varchar(45) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `two_factor_backup_codes_user_id_foreign` (`user_id`),
-  KEY `two_factor_backup_codes_code_hash_index` (`code_hash`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Audit-Log-Tabelle
 CREATE TABLE IF NOT EXISTS `audit_logs` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -349,8 +280,6 @@ CREATE TABLE IF NOT EXISTS `settings` (
   KEY `settings_category_index` (`category`),
   KEY `settings_updated_by_foreign` (`updated_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Foreign Key Constraints werden übersprungen wenn bereits vorhanden
 
 SET FOREIGN_KEY_CHECKS = 1;
 COMMIT;

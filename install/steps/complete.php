@@ -26,9 +26,16 @@ if (isset($_GET['install']) && $_GET['install'] === 'true') {
             $installationSteps[] = 'Initialisiere Datenbank...';
             $dbInitialized = initializeDatabase();
             if (!$dbInitialized) {
-                throw new Exception('Datenbank konnte nicht initialisiert werden');
+                // Fallback: Versuche Reset und erneute Initialisierung
+                $installationSteps[] = '⚠️ Erste Initialisierung fehlgeschlagen, versuche Reset...';
+                if (resetDatabase() && initializeDatabase()) {
+                    $installationSteps[] = '✅ Datenbank nach Reset initialisiert';
+                } else {
+                    throw new Exception('Datenbank konnte auch nach Reset nicht initialisiert werden');
+                }
+            } else {
+                $installationSteps[] = '✅ Datenbank initialisiert';
             }
-            $installationSteps[] = '✅ Datenbank initialisiert';
             
             // 3. Administrator-Benutzer erstellen
             $installationSteps[] = 'Erstelle Administrator-Benutzer...';
@@ -144,9 +151,11 @@ function initializeDatabase(): bool {
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ]);
         
-        // SQL-Schema-Datei finden
+        // Try safe schema first (without foreign keys)
         $possiblePaths = [
-            __DIR__ . '/../database/schema.sql',
+            __DIR__ . '/../database/schema_safe.sql',  // Neue sichere Variante
+            __DIR__ . '/../database/schema.sql',       // Original mit Foreign Keys
+            ROOT_PATH . '/install/database/schema_safe.sql',
             ROOT_PATH . '/install/database/schema.sql',
             ROOT_PATH . '/database/schema.sql'
         ];
@@ -166,31 +175,111 @@ function initializeDatabase(): bool {
             throw new Exception('Schema-Datei nicht gefunden in: ' . implode(', ', $possiblePaths));
         }
         
-        // SQL in einzelne Statements aufteilen (für bessere Fehlerbehandlung)
+        // Bei wiederholter Installation: Nur Tabellen erstellen, Foreign Keys überspringen
+        $isReinstall = isReinstallation($pdo);
+        if ($isReinstall) {
+            error_log("Detected reinstallation - skipping foreign key constraints");
+        }
+        
+        // SQL in einzelne Statements aufteilen
         $statements = array_filter(array_map('trim', explode(';', $sql)));
         
         $executedStatements = 0;
+        $skippedStatements = 0;
+        
         foreach ($statements as $statement) {
             if (!empty($statement)) {
+                // Bei Reinstallation: Foreign Key Constraints überspringen
+                if ($isReinstall && (
+                    strpos($statement, 'ADD CONSTRAINT') !== false || 
+                    strpos($statement, 'FOREIGN KEY') !== false
+                )) {
+                    $skippedStatements++;
+                    continue;
+                }
+                
                 try {
                     $pdo->exec($statement);
                     $executedStatements++;
                 } catch (PDOException $e) {
-                    error_log("SQL Statement failed: $statement - Error: " . $e->getMessage());
-                    // Bei CREATE TABLE Fehlern weitermachen (Tabelle existiert möglicherweise)
-                    if (strpos($statement, 'CREATE TABLE') === false) {
-                        throw $e;
+                    $errorMsg = $e->getMessage();
+                    error_log("SQL Statement failed: " . substr($statement, 0, 100) . "... - Error: " . $errorMsg);
+                    
+                    // Bei diesen Fehlern weitermachen (nicht kritisch)
+                    if (
+                        strpos($errorMsg, 'already exists') !== false ||
+                        strpos($errorMsg, 'Duplicate') !== false ||
+                        strpos($errorMsg, 'CREATE TABLE') !== false ||
+                        strpos($errorMsg, 'CONSTRAINT') !== false
+                    ) {
+                        $skippedStatements++;
+                        continue;
                     }
+                    
+                    // Andere Fehler sind kritisch
+                    throw $e;
                 }
             }
         }
         
-        error_log("Database initialized: $executedStatements statements executed from $usedPath");
+        error_log("Database initialized: $executedStatements statements executed, $skippedStatements skipped from $usedPath");
         return true;
         
     } catch (Exception $e) {
         error_log('Database initialization error: ' . $e->getMessage());
-        throw $e; // Fehler weiterleiten für bessere Diagnose
+        throw $e;
+    }
+}
+
+/**
+ * Prüft ob es sich um eine Reinstallation handelt
+ */
+function isReinstallation(PDO $pdo): bool {
+    try {
+        $stmt = $pdo->query("SHOW TABLES LIKE 'users'");
+        return $stmt->rowCount() > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+/**
+ * Reset der Datenbank (nur als letzter Ausweg)
+ */
+function resetDatabase(): bool {
+    try {
+        $config = $_SESSION['db_config'];
+        $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['name']};charset=utf8mb4";
+        $pdo = new PDO($dsn, $config['username'], $config['password'], [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
+        
+        // Alle Foreign Key Constraints entfernen
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+        
+        // Alle Tabellen der Anwendung löschen
+        $tables = [
+            'settings', 'audit_logs', 'two_factor_backup_codes', 'notfall_zugriffe',
+            'notfall_kontakte', 'freigaben', 'dokumente', 'zugangsdaten', 'vertraege',
+            'korrespondenten', 'role_permissions', 'user_roles', 'permissions', 'roles', 'users'
+        ];
+        
+        foreach ($tables as $table) {
+            try {
+                $pdo->exec("DROP TABLE IF EXISTS `$table`");
+            } catch (Exception $e) {
+                // Ignorieren falls Tabelle nicht existiert
+            }
+        }
+        
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
+        
+        error_log("Database reset completed");
+        return true;
+        
+    } catch (Exception $e) {
+        error_log('Database reset error: ' . $e->getMessage());
+        return false;
     }
 }
 
