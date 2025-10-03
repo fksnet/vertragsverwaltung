@@ -1,0 +1,14 @@
+# Deny all access to storage directory
+Require all denied
+
+<Files "*.log">
+    Require all denied
+</Files>
+
+<Files "*.cache">
+    Require all denied
+</Files>
+
+<Files "*.php">
+    Require all denied
+</Files>

@@ -1,0 +1,21 @@
+User-agent: *
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow installation directory
+Disallow: /install/
+
+# Disallow sensitive directories
+Disallow: /config/
+Disallow: /storage/
+Disallow: /database/
+Disallow: /app/
+Disallow: /scripts/
+
+# Allow public assets
+Allow: /public/assets/
+
+# Sitemap (wenn vorhanden)
+# Sitemap: https://ihre-domain.de/sitemap.xml

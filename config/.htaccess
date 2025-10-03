@@ -1,0 +1,14 @@
+# Deny all access to config directory
+Require all denied
+
+<Files "*.php">
+    Require all denied
+</Files>
+
+<Files "*.json">
+    Require all denied
+</Files>
+
+<Files ".env*">
+    Require all denied
+</Files>

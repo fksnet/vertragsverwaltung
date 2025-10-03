@@ -1,0 +1,49 @@
+# Files and directories to exclude from release package
+
+# Development files
+.git/
+.github/
+node_modules/
+vendor/
+tests/
+.env
+.env.example
+composer.json
+composer.lock
+package.json
+package-lock.json
+phpunit.xml
+phpstan.neon
+postcss.config.js
+tailwind.config.js
+
+# Build files
+build/
+
+# Development scripts (keep production scripts)
+scripts/tools/
+scripts/test/
+
+# Documentation that's not needed in release
+README.md
+CLAUDE.md
+GEMINI.md
+
+# Release files (only needed during packaging)
+.release-exclude
+
+# Cache and temporary files
+storage/logs/
+storage/cache/
+storage/sessions/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
