@@ -6,24 +6,7 @@
 $errors = [];
 $success = [];
 
-// Weiter zum nächsten Schritt
-if ($_POST && isset($_POST['continue'])) {
-    // Alle erforderlichen Checks nochmals durchführen
-    $allPassed = true;
-    
-    // Kurzer Re-Check der wichtigsten Anforderungen
-    if (version_compare(PHP_VERSION, '8.1.0', '<')) $allPassed = false;
-    if (!extension_loaded('pdo_mysql')) $allPassed = false;
-    if (!is_writable(ROOT_PATH)) $allPassed = false;
-    
-    if ($allPassed) {
-        $_SESSION['requirements_passed'] = true;
-        header('Location: ?step=database');
-        exit;
-    } else {
-        $errors[] = 'Nicht alle Systemanforderungen sind erfüllt.';
-    }
-}
+// POST-Verarbeitung wurde in den Hauptwizard verschoben um Header-Probleme zu vermeiden
 
 // System-Checks durchführen
 $checks = [

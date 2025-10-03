@@ -37,16 +37,7 @@ if ($_POST && isset($_POST['save_settings'])) {
     }
 }
 
-// Installation abschließen
-if ($_POST && isset($_POST['complete_installation'])) {
-    if (isset($_SESSION['db_config'], $_SESSION['admin_user'], $_SESSION['app_settings'])) {
-        // Zur Installations-Abschluss-Seite
-        header('Location: ?step=complete&install=true');
-        exit;
-    } else {
-        $errors[] = 'Nicht alle Konfigurationsschritte abgeschlossen. Bitte gehen Sie zurück und vervollständigen Sie die Installation.';
-    }
-}
+// Redirect-Verarbeitung wurde in den Hauptwizard verschoben
 
 // Standardwerte
 $appName = $_POST['app_name'] ?? $_SESSION['app_settings']['name'] ?? 'Vertragsverwaltung';

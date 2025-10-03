@@ -56,11 +56,7 @@ if ($_POST && isset($_POST['test_connection'])) {
     }
 }
 
-// Weiter zum nächsten Schritt
-if ($_POST && isset($_POST['continue']) && isset($_SESSION['db_config'])) {
-    header('Location: ?step=admin');
-    exit;
-}
+// Redirect-Verarbeitung wurde in den Hauptwizard verschoben
 
 // Standardwerte
 $dbHost = $_POST['db_host'] ?? $_SESSION['db_config']['host'] ?? 'localhost';

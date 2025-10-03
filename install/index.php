@@ -35,16 +35,50 @@ if ($step !== 'complete' && file_exists(CONFIG_PATH . '/app.php')) {
     }
 }
 
-// Session-Debug-Info
-if ($debug) {
-    echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;">';
-    echo '<strong>Debug Info:</strong><br>';
-    echo 'Current Step: ' . htmlspecialchars($step) . '<br>';
-    echo 'Session ID: ' . session_id() . '<br>';
-    echo 'Session Data: <pre>' . htmlspecialchars(print_r($_SESSION, true)) . '</pre>';
-    echo 'POST Data: <pre>' . htmlspecialchars(print_r($_POST, true)) . '</pre>';
-    echo 'GET Data: <pre>' . htmlspecialchars(print_r($_GET, true)) . '</pre>';
-    echo '</div>';
+// POST-Verarbeitung für alle Steps VOR jeglichem Output
+if ($_POST) {
+    switch ($step) {
+        case 'requirements':
+            if (isset($_POST['continue'])) {
+                // Alle erforderlichen Checks nochmals durchführen
+                $allPassed = true;
+                
+                // Kurzer Re-Check der wichtigsten Anforderungen
+                if (version_compare(PHP_VERSION, '8.1.0', '<')) $allPassed = false;
+                if (!extension_loaded('pdo_mysql')) $allPassed = false;
+                if (!is_writable(ROOT_PATH)) $allPassed = false;
+                
+                if ($allPassed) {
+                    $_SESSION['requirements_passed'] = true;
+                    header('Location: ?step=database');
+                    exit;
+                }
+            }
+            break;
+            
+        case 'database':
+            if (isset($_POST['continue']) && isset($_SESSION['db_config'])) {
+                header('Location: ?step=admin');
+                exit;
+            }
+            break;
+            
+        case 'admin':
+            if (isset($_POST['continue']) && isset($_SESSION['admin_user'])) {
+                header('Location: ?step=settings');
+                exit;
+            }
+            break;
+            
+        case 'settings':
+            if (isset($_POST['complete_installation'])) {
+                if (isset($_SESSION['db_config'], $_SESSION['admin_user'], $_SESSION['app_settings'])) {
+                    header('Location: ?step=complete&install=true');
+                    exit;
+                }
+            }
+            break;
+    }
 }
 
 // Fehler-Array
@@ -306,6 +340,20 @@ $success = [];
             }
             ?>
         </div>
+        
+        <?php
+        // Debug-Info am Ende ausgeben (nach allen Redirects)
+        if ($debug) {
+            echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;">';
+            echo '<strong>Debug Info:</strong><br>';
+            echo 'Current Step: ' . htmlspecialchars($step) . '<br>';
+            echo 'Session ID: ' . session_id() . '<br>';
+            echo 'Session Data: <pre>' . htmlspecialchars(print_r($_SESSION, true)) . '</pre>';
+            echo 'POST Data: <pre>' . htmlspecialchars(print_r($_POST, true)) . '</pre>';
+            echo 'GET Data: <pre>' . htmlspecialchars(print_r($_GET, true)) . '</pre>';
+            echo '</div>';
+        }
+        ?>
     </div>
 </body>
 </html>

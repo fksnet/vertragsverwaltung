@@ -43,11 +43,7 @@ if ($_POST && isset($_POST['create_admin'])) {
     }
 }
 
-// Weiter zum nächsten Schritt
-if ($_POST && isset($_POST['continue']) && isset($_SESSION['admin_user'])) {
-    header('Location: ?step=settings');
-    exit;
-}
+// Redirect-Verarbeitung wurde in den Hauptwizard verschoben
 
 // Standardwerte
 $name = $_POST['admin_name'] ?? $_SESSION['admin_user']['name'] ?? '';
