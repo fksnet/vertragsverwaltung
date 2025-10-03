@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vertragsverwaltung - Willkommen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #2563eb;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        p {
+            color: #6b7280;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .success {
+            background: #f0fdf4;
+            color: #166534;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 5px;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📋</div>
+        <h1>Vertragsverwaltung</h1>
+        
+        <div class="success">
+            <strong>🎉 Installation erfolgreich abgeschlossen!</strong><br>
+            Ihre Vertragsverwaltung ist bereit für den Einsatz.
+        </div>
+        
+        <p>Die Anwendung wurde erfolgreich installiert und konfiguriert.</p>
+        <p>Sie können jetzt mit der Verwaltung Ihrer Verträge beginnen.</p>
+        
+        <div style="margin-top: 30px;">
+            <a href="/?route=dashboard" class="btn">🏠 Zur Anwendung</a>
+            <a href="/?route=test" class="btn btn-secondary">🔧 System-Test</a>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+            <p style="font-size: 0.9em; color: #9ca3af;">
+                <strong>Nächste Schritte:</strong><br>
+                • Loggen Sie sich mit Ihrem Administrator-Account ein<br>
+                • Erstellen Sie Ihre ersten Verträge<br>
+                • Konfigurieren Sie erweiterte Einstellungen
+            </p>
+        </div>
+    </div>
+</body>
+</html>

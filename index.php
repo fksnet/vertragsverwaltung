@@ -14,6 +14,18 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Debug-Modus für Installationsprobleme
+$debug = isset($_GET['debug']) && $_GET['debug'] === '1';
+if ($debug) {
+    echo '<div style="background: #f0f0f0; padding: 10px; margin: 10px; border: 1px solid #ccc;">';
+    echo '<h3>Debug-Info</h3>';
+    echo '<p>ROOT_PATH: ' . __DIR__ . '</p>';
+    echo '<p>Config exists: ' . (file_exists(__DIR__ . '/config/app.php') ? 'YES' : 'NO') . '</p>';
+    echo '<p>Bootstrap exists: ' . (file_exists(__DIR__ . '/bootstrap/app.php') ? 'YES' : 'NO') . '</p>';
+    echo '<p>Application exists: ' . (file_exists(__DIR__ . '/app/Core/Application.php') ? 'YES' : 'NO') . '</p>';
+    echo '</div>';
+}
+
 // Basis-Pfade definieren
 define('ROOT_PATH', __DIR__);
 define('APP_PATH', ROOT_PATH . '/app');

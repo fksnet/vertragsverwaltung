@@ -64,8 +64,15 @@ spl_autoload_register(function ($className) {
         $file = APP_PATH . '/' . str_replace(['App\\', '\\'], ['', '/'], $className) . '.php';
         if (file_exists($file)) {
             require_once $file;
+            return true;
+        } else {
+            // Debug-Info für fehlende Klassen
+            if (defined('APP_DEBUG') && APP_DEBUG) {
+                error_log("Autoloader: Class not found: $className (looked for: $file)");
+            }
         }
     }
+    return false;
 });
 
 // Konfiguration laden

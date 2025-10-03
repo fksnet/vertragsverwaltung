@@ -77,6 +77,13 @@ class Application
             if (!$this->isInstalled()) {
                 $this->redirectToInstaller();
                 return true;
+            } else if (empty($route)) {
+                // Nach der Installation: Willkommensseite zeigen
+                $welcomePage = $this->rootPath . '/public/welcome.html';
+                if (file_exists($welcomePage)) {
+                    include $welcomePage;
+                    return true;
+                }
             }
         }
         
@@ -101,7 +108,7 @@ class Application
     private function parseRoute(string $route): array
     {
         if (empty($route)) {
-            return ['Dashboard', 'index', []];
+            return ['Test', 'index', []];
         }
         
         $segments = explode('/', $route);

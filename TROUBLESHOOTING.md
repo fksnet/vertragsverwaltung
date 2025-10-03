@@ -94,6 +94,56 @@ ini_set('display_errors', 1);
    - `/install/index.php` 
    - `/install/steps/welcome.php`
 
+### Problem: 500 Fehler nach erfolgreicher Installation
+
+**Symptome:**
+- Wizard läuft erfolgreich durch
+- Nach Installation: "Internal Server Error 500"
+- Error-Logs können SSL-Warnungen enthalten (nicht relevant)
+
+**Diagnose-Schritte:**
+
+#### 1. Debug-Modus aktivieren
+```
+URL: https://ihre-domain.de/?debug=1
+Zeigt: Dateipfade, Konfigurationsstatus
+```
+
+#### 2. Test-Controller verwenden
+```
+URL: https://ihre-domain.de/?route=test
+Sollte zeigen: Installations-Status-Seite
+```
+
+#### 3. Konfigurationsdateien prüfen
+```
+Dateien müssen existieren:
+- /config/app.php
+- /config/database.php
+- /config/security.php
+```
+
+#### 4. Berechtigungen prüfen
+```bash
+chmod 755 storage/ config/ app/
+chmod 644 config/*.php
+chmod 775 storage/logs/ storage/cache/
+```
+
+**Häufige Ursachen:**
+
+1. **Fehlende Konfigurationsdateien**
+   - Installation nicht vollständig abgeschlossen
+   - Lösung: Installation wiederholen
+
+2. **Autoloader-Probleme**
+   - PHP-Klassen können nicht geladen werden  
+   - Lösung: PHP-Version prüfen (≥ 8.1)
+
+3. **Datenbankverbindung**
+   - Verbindungsdaten inkorrekt
+   - Lösung: `/config/database.php` manuell prüfen
+
 ### Problem: Installation bricht bei Schritt 6 ab
 
 **Häufig:** Datenbankrechte unzureichend
