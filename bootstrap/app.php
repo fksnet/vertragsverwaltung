@@ -46,7 +46,7 @@ foreach ($storageDirs as $dir) {
         
         // .htaccess für Sicherheit hinzufügen
         if (!file_exists($dir . '/.htaccess')) {
-            file_put_contents($dir . '/.htaccess', "Order allow,deny\nDeny from all\n");
+            @file_put_contents($dir . '/.htaccess', "Order allow,deny\nDeny from all\n");
         }
     }
 }
@@ -114,7 +114,7 @@ if (!APP_DEBUG) {
         }
         
         $logMessage = date('Y-m-d H:i:s') . " ERROR: $message in $file:$line" . PHP_EOL;
-        error_log($logMessage, 3, STORAGE_PATH . '/logs/error.log');
+        @error_log($logMessage, 3, STORAGE_PATH . '/logs/error.log');
         
         return true;
     });
@@ -122,10 +122,18 @@ if (!APP_DEBUG) {
     set_exception_handler(function($exception) {
         $logMessage = date('Y-m-d H:i:s') . " EXCEPTION: " . $exception->getMessage() . 
                      " in " . $exception->getFile() . ":" . $exception->getLine() . PHP_EOL;
-        error_log($logMessage, 3, STORAGE_PATH . '/logs/error.log');
+        @error_log($logMessage, 3, STORAGE_PATH . '/logs/error.log');
         
         http_response_code(500);
-        include ROOT_PATH . '/public/errors/500.html';
+        
+        // Prüfen ob Fehlerseite existiert, bevor wir sie laden
+        $errorPage = ROOT_PATH . '/public/errors/500.html';
+        if (file_exists($errorPage)) {
+            include $errorPage;
+        } else {
+            echo '<h1>Service Temporarily Unavailable</h1>';
+            echo '<p>We are currently experiencing technical difficulties. Please try again later.</p>';
+        }
         exit;
     });
 }

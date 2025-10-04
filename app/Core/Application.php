@@ -1,5 +1,6 @@
 <?php
-declare(strict_types=1);
+// Entfernt strict_types für bessere Webhosting-Kompatibilität
+// declare(strict_types=1);
 
 namespace App\Core;
 
@@ -274,7 +275,10 @@ class Application
     {
         $routeFile = $this->rootPath . '/routes/web.php';
         if (file_exists($routeFile)) {
-            $this->routes = include $routeFile;
+            $routes = include $routeFile;
+            if (is_array($routes)) {
+                $this->routes = $routes;
+            }
         }
     }
     
@@ -286,7 +290,7 @@ class Application
         // Fehler protokollieren
         $logMessage = date('Y-m-d H:i:s') . " ERROR: " . $e->getMessage() . 
                      " in " . $e->getFile() . ":" . $e->getLine() . PHP_EOL;
-        error_log($logMessage, 3, STORAGE_PATH . '/logs/application.log');
+        @error_log($logMessage, 3, STORAGE_PATH . '/logs/application.log');
         
         // Fehlerseite anzeigen
         http_response_code(500);
