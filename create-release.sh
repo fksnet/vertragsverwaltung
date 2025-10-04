@@ -5,7 +5,7 @@
 
 set -e
 
-VERSION="1.0.0"
+VERSION="1.0.1"
 RELEASE_NAME="vertragsverwaltung-v${VERSION}"
 RELEASE_DIR="/tmp/${RELEASE_NAME}"
 CURRENT_DIR="$(pwd)"

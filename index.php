@@ -6,7 +6,7 @@
  * Kompatibel mit Standard-PHP-Webhosting-Umgebungen.
  * 
  * @package Vertragsverwaltung
- * @version 1.0.0
+ * @version 1.0.1
  * @author Vertragsverwaltung System
  */
 

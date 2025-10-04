@@ -31,6 +31,10 @@ GEMINI.md
 
 # Release files (only needed during packaging)
 .release-exclude
+create-release.sh
+
+# Previous release packages
+*.zip
 
 # Cache and temporary files
 storage/logs/

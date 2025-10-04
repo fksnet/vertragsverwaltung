@@ -96,7 +96,7 @@ function createConfigFiles(): bool {
         $appConfig .= "    'debug' => " . var_export($appSettings['debug'], true) . ",\n";
         $appConfig .= "    'enable_registration' => " . var_export($appSettings['enable_registration'], true) . ",\n";
         $appConfig .= "    'enable_api' => " . var_export($appSettings['enable_api'], true) . ",\n";
-        $appConfig .= "    'version' => '1.0.0',\n";
+        $appConfig .= "    'version' => '1.0.1',\n";
         $appConfig .= "    'installed' => false,\n";
         $appConfig .= "];";
         
@@ -449,7 +449,7 @@ function updateConfigFile(array $updates): bool {
         <ul style="margin: 0; padding-left: 20px;">
             <li><strong>Administrator-E-Mail:</strong> <?= htmlspecialchars($_SESSION['admin_user']['email'] ?? 'Nicht verfügbar') ?></li>
             <li><strong>Installations-Datum:</strong> <?= date('d.m.Y H:i:s') ?></li>
-            <li><strong>Version:</strong> Vertragsverwaltung 1.0.0</li>
+            <li><strong>Version:</strong> Vertragsverwaltung 1.0.1</li>
             <li><strong>PHP-Version:</strong> <?= PHP_VERSION ?></li>
         </ul>
     </div>

@@ -5,7 +5,7 @@
  * Initialisiert die Vertragsverwaltung-Anwendung für Webhosting-Umgebungen.
  * 
  * @package Vertragsverwaltung
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 // Sicherstellen, dass dieser Code nur über den Haupteinstiegspunkt ausgeführt wird
